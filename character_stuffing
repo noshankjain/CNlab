@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <string.h>
+
+#define FLAG 'F' // Frame delimiter character
+#define ESC 'E'  // Escape character
+
+// Function to perform character stuffing
+void characterStuffing(char *input, char *stuffed) {
+    int i, j = 0;
+    stuffed[j++] = FLAG; // Add starting flag
+
+    for (i = 0; i < strlen(input); i++) {
+        if (input[i] == FLAG || input[i] == ESC) {
+            stuffed[j++] = ESC; // Insert escape character
+        }
+        stuffed[j++] = input[i]; // Copy the original character
+    }
+
+    stuffed[j++] = FLAG; // Add ending flag
+    stuffed[j] = '\0';   // Null-terminate
+}
+
+// Function to perform character destuffing
+void characterDestuffing(char *stuffed, char *destuffed) {
+    int i, j = 0;
+
+    // Skip starting flag
+    for (i = 1; i < strlen(stuffed) - 1; i++) {
+        if (stuffed[i] == ESC) {
+            i++; // Skip escape, take next character
+        }
+        destuffed[j++] = stuffed[i];
+    }
+    destuffed[j] = '\0';
+}
+
+int main() {
+    char input[100];
+    char stuffed[200];
+    char destuffed[100];
+
+    printf("Enter binary value: ");
+    fgets(input, sizeof(input), stdin);
+    input[strcspn(input, "\n")] = '\0'; // Remove trailing newline
+
+    characterStuffing(input, stuffed);
+
+    printf("\nAppending delimiters: %c%s%c\n", FLAG, input, FLAG);
+    printf("After stuffing: %s\n", stuffed);
+
+    characterDestuffing(stuffed, destuffed);
+    printf("Destuffing: %s\n", destuffed);
+
+    return 0;
+}

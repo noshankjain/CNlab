@@ -1,58 +1,58 @@
-/* bit stuffing*/
-#include<stdio.h>
-#include<string.h>
-void main()
-{
-char c1[200]="",c2[200]="",c[100],d1[50]="01111110",d2[50]="01111110";
-int m1=0,i,j=0,l=0,i1,m,n,k=0;
-printf("enter binary value: ");
-gets(c);
-m=strlen(d1);
-strcat(d1,c);
-strcat(d1,d2);
-printf("\n appending delimiter ");
-puts(d1);
-for(i=0;i<strlen(d1);i++)
-{
- c1[1]=d1[i];
- if(l>=4)
- {
-  if(c1[1]=='1' && c1[1-1]=='1' && c1[1-2]=='1' && c1[1-3]=='1' && c1[1-4]=='1')
-  {
-   strcat(c1,"0");
-   l++;
-  }
- }
-l++;
-}
-printf("\n after stuffing ");
-puts(c1);
-printf("\n destuffing ");
-for(i=0;i<strlen(c1);i++)
-{
- printf("%c",c1[i]);
- c2[k]=c1[i];
- k++;
- if(c1[i]=='1')
-   j++;
- else
-   j=0;
- if(j==5)
- {
-  while(c1[j+1]!=0)
-   break;
-  i++;
-  j=0;
- }
-}
-for(i=0;i<m;i++)
- continue;
- printf("\n");
- for(i=m;i<strlen(c2);i++)
- {
-  printf("%c",c2[i]);
-  m1++;
-  if(m1==strlen(c))
-    break;
- }
+#include <stdio.h>
+#include <string.h>
+
+#define FLAG "01111110"
+
+int main() {
+    char input[100], stuffed[200], destuffed[200];
+    int i, j = 0, count = 0;
+
+    printf("Enter binary value: ");
+    scanf("%s", input);
+
+    // Start with FLAG
+    strcpy(stuffed, FLAG);
+
+    // Bit Stuffing
+    for(i = 0; i < strlen(input); i++) {
+        int len = strlen(stuffed);
+        stuffed[len] = input[i];
+        stuffed[len + 1] = '\0';
+
+        if(input[i] == '1') {
+            count++;
+            if(count == 5) {
+                strcat(stuffed, "0");  // Stuff a 0
+                count = 0;
+            }
+        } else {
+            count = 0;
+        }
+    }
+
+    // End with FLAG
+    strcat(stuffed, FLAG);
+
+    printf("\nStuffed: %s\n", stuffed);
+
+    // Bit Destuffing
+    j = 0;
+    count = 0;
+    for(i = strlen(FLAG); i < strlen(stuffed) - strlen(FLAG); i++) { // skip flags
+        destuffed[j++] = stuffed[i];
+        if(stuffed[i] == '1') {
+            count++;
+            if(count == 5) {
+                i++; // Skip stuffed 0
+                count = 0;
+            }
+        } else {
+            count = 0;
+        }
+    }
+    destuffed[j] = '\0';
+
+    printf("Destuffed: %s\n", destuffed);
+
+    return 0;
 }

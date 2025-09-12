@@ -1,93 +1,42 @@
 #include <stdio.h>
 #include <string.h>
-
+char data[50], g[20], temp[20];
+void XOR() {
+    for (int i = 0; i < strlen(g); i++)
+        temp[i] = (temp[i] == g[i] ? '0' : '1');
+}
+void CRC() {
+    int i, j;
+    for (i = 0; i < strlen(g); i++)
+        temp[i] = data[i];
+    do {
+        if (temp[0] == '1')
+            XOR();
+        for (j = 0; j < strlen(g) - 1; j++)
+            temp[j] = temp[j + 1];
+        temp[j] = data[i++];
+    } while (i <= strlen(data));
+}
 int main() {
-    char msg[100], key[20], data[120], transmitted_msg[120], received_msg[120];
-    char remainder[20];
-    int msg_len, key_len, i, j, error = 0;
-
-    // Sender Side
-    printf("Sender Side:\n");
-    printf("Enter binary message: ");
-    scanf("%s", msg);
-    printf("Enter generator polynomial (binary): ");
-    scanf("%s", key);
-
-    msg_len = strlen(msg);
-    key_len = strlen(key);
-
-    // Append (key_len - 1) zeros to the message
-    strcpy(data, msg);
-    for (i = 0; i < key_len - 1; i++) {
-        data[msg_len + i] = '0';
-    }
-    data[msg_len + key_len - 1] = '\0';
-
-    // Make a copy of data to perform division
-    char temp[120];
-    strcpy(temp, data);
-
-    // Perform division
-    for (i = 0; i <= strlen(msg) - 1; i++) {
-        if (temp[i] == '1') {
-            for (j = 0; j < key_len; j++) {
-                temp[i + j] = (temp[i + j] == key[j]) ? '0' : '1';
-            }
-        }
-    }
-
-    // Extract remainder
-    for (i = 0; i < key_len - 1; i++) {
-        remainder[i] = temp[msg_len + i];
-    }
-    remainder[key_len - 1] = '\0';
-
-    // Create transmitted message (original + remainder)
-    strcpy(transmitted_msg, msg);
-    strcat(transmitted_msg, remainder);
-
-    printf("\nSender CRC Remainder: %s", remainder);
-    printf("\nTransmitted Message (Message + CRC): %s\n", transmitted_msg);
-
-    // Receiver Side
-    printf("\nReceiver Side:\n");
-    printf("Enter received message (with CRC): ");
-    scanf("%s", received_msg);
-
-    // Copy received message into temp buffer for division
-    strcpy(temp, received_msg);
-
-    // Perform division again
-    for (i = 0; i <= strlen(received_msg) - key_len; i++) {
-        if (temp[i] == '1') {
-            for (j = 0; j < key_len; j++) {
-                temp[i + j] = (temp[i + j] == key[j]) ? '0' : '1';
-            }
-        }
-    }
-
-    // Extract receiver-side remainder
-    for (i = 0; i < key_len - 1; i++) {
-        remainder[i] = temp[strlen(received_msg) - key_len + 1 + i];
-    }
-    remainder[key_len - 1] = '\0';
-
-    printf("\nReceiver CRC Remainder: %s", remainder);
-
-    // Check if remainder is all zeros
-    error = 0;
-    for (i = 0; i < key_len - 1; i++) {
-        if (remainder[i] != '0') {
-            error = 1;
-            break;
-        }
-    }
-
-    if (error) {
-        printf("\nError detected in received message.\n");
-    } else {
-        printf("\nNo error detected. Message received correctly.\n");
-    }
-
+    int n, m, k;
+    strcpy(g, "110000001111");
+    printf("Enter data: ");
+    scanf("%s", data);
+    n = strlen(data);
+    m = strlen(g);
+    printf("\nGenerator Polynomial (g): %s\n", g);
+    printf("Length of g: %d\n", m);
+    printf("Length of data: %d\n", n);
+    for (k = n; k < n + m - 1; k++)
+        data[k] = '0';
+    data[k] = '\0';
+    printf("\nModified Data (after appending %d zeros): %s\n", m - 1, data);
+    CRC();
+    printf("\nCRC Remainder: %s\n", temp);
+    int j;
+    for (int k = n, j = 0; k < n + m - 1; k++, j++)
+        data[k] = temp[j];
+    data[n + m - 1] = '\0';
+    printf("\nFinal Codeword (Data + Remainder): %s\n", data);
     return 0;
 }

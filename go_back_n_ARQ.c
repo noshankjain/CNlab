@@ -5,34 +5,34 @@
 int main() {
     int totalFrames, windowSize;
     int base = 0, nextSeq = 0;
-    
-    srand(time(0));  // seed for random loss
-    
-    // Input total frames and window size
-    printf("Enter total frames to send: ");
+
+    srand(time(0));  // seed random generator
+
+    printf("Total frames: ");
     scanf("%d", &totalFrames);
-    printf("Enter window size: ");
+    printf("Window size: ");
     scanf("%d", &windowSize);
 
-    printf("\n--- Go-Back-N Simulation ---\n\n");
+    printf("\nGo-Back-N Simulation:\n");
 
     while (base < totalFrames) {
         // Send frames in the window
-        for (int i = nextSeq; i < base + windowSize && i < totalFrames; i++) {
-            printf("Sending frame %d\n", i);
+        while (nextSeq < base + windowSize && nextSeq < totalFrames) {
+            printf("Send %d ", nextSeq);
             nextSeq++;
         }
+        printf("\n");
 
-        // Randomly simulate if frame at base is received or lost
-        if (rand() % 2 == 1) {
-            printf("ACK received for frame %d\n\n", base);
-            base++;  // slide window
+        // Simulate ACK or loss for the base frame
+        if (rand() % 2) {
+            printf("ACK %d received\n\n", base);
+            base++;
         } else {
-            printf("Frame %d lost! Retransmitting window\n\n", base);
-            nextSeq = base; // go back to base
+            printf("Loss at %d, retransmit window\n\n", base);
+            nextSeq = base;
         }
     }
 
-    printf("All frames successfully transmitted!\n");
+    printf("Transmission complete.\n");
     return 0;
 }
